@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAMA & Hoshino Chat App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* App Header */
+        .app-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .credits {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .developer {
+            color: #f39c12;
+        }
+
+        .partner {
+            color: #e74c3c;
+        }
+
+        .section {
+            padding: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Login Section */
+        #login-section {
+            padding: 30px;
+        }
+
+        .login-container {
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .welcome-text {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        #username-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #username-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        /* Chat Section */
+        .chat-header {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-title h3 {
+            margin: 0;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 10px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #e74c3c;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #current-user {
+            color: #ecf0f1;
+            font-size: 14px;
+        }
+
+        .chat-header button {
+            width: auto;
+            padding: 8px 15px;
+            background: #e74c3c;
+            font-size: 12px;
+        }
+
+        .chat-header button:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        #messages-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 0;
+            background: #ecf0f1;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 18px;
+            max-width: 85%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .message.own {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.other {
+            background: white;
+            color: #2c3e50;
+            border-bottom-left-radius: 5px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .message-sender {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
+
+        .message.own .message-sender {
+            color: #ecf0f1;
+        }
+
+        .message.other .message-sender {
+            color: #e74c3c;
+        }
+
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #bdc3c7;
+        }
+
+        .message-input input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 25px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .message-input input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .message-input button {
+            width: auto;
+            padding: 12px 20px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .chat-footer {
+            background: #34495e;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .chat-footer p {
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        #messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #messages-container::-webkit-scrollbar-track {
+            background: #ecf0f1;
+        }
+
+        #messages-container::-webkit-scrollbar-thumb {
+            background: #bdc3c7;
+            border-radius: 3px;
+        }
+
+        #messages-container::-webkit-scrollbar-thumb:hover {
+            background: #95a5a6;
+        }
+    </style>
+    
+    <!-- Firebase SDK - VERSI COMPAT -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <h1>✨ YAMA Chat ✨</h1>
+            <div class="credits">
+                <span class="developer">Developer: <strong>YAMA</strong></span>
+                <span class="partner">Partner: <strong>Hoshino</strong></span>
+            </div>
+        </div>
+
+        <div id="login-section" class="section">
+            <div class="login-container">
+                <h2>🎯 Login ke YAMA Chat</h2>
+                <p class="welcome-text">Selamat datang di aplikasi chat real-time oleh YAMA & Hoshino</p>
+                <input type="text" id="username-input" placeholder="Masukkan username Anda">
+                <button id="login-btn">🚀 Masuk Chat</button>
+            </div>
+        </div>
+
+        <div id="chat-section" class="section hidden">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <h3>💬 YAMA Chat Room</h3>
+                    <div class="live-indicator">
+                        <span class="dot"></span>
+                        Live
+                    </div>
+                </div>
+                <div class="user-info">
+                    <span id="current-user"></span>
+                    <button id="logout-btn">👋 Keluar</button>
+                </div>
+            </div>
+            
+            <div id="messages-container"></div>
+            
+            <div class="message-input">
+                <input type="text" id="message-input" placeholder="Ketik pesan Anda...">
+                <button id="send-btn">📤 Kirim</button>
+            </div>
+
+            <div class="chat-footer">
+                <p>Dikembangkan dengan ❤️ oleh <strong>YAMA</strong> dan <strong>Hoshino</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration - PAKAI YANG MILIK ANDA
+        const firebaseConfig = {
+            apiKey: "AIzaSyDtibOlT1Ul-gRA6ldWZ6hTjEUfr7lBILw",
+            authDomain: "yama-chat-real-time.firebaseapp.com",
+            projectId: "yama-chat-real-time",
+            storageBucket: "yama-chat-real-time.firebasestorage.app",
+            messagingSenderId: "123684414118",
+            appId: "1:123684414118:web:1c8c6067eb8a41fd1e0a67",
+            measurementId: "G-64B5FBBFF0"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        let currentUser = null;
+
+        // Setup event listeners ketika halaman loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('YAMA Chat App loaded!');
+            
+            // Login button
+            document.getElementById('login-btn').addEventListener('click', login);
+            
+            // Logout button
+            document.getElementById('logout-btn').addEventListener('click', logout);
+            
+            // Send message button
+            document.getElementById('send-btn').addEventListener('click', sendMessage);
+            
+            // Enter key untuk send message
+            document.getElementById('message-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Auto check auth state
+            auth.onAuthStateChanged((user) => {
+                console.log('Auth state changed:', user);
+                if (user && currentUser) {
+                    showChatSection();
+                    setupChatListener();
+                }
+            });
+        });
+
+        // Fungsi Login
+        async function login() {
+            const username = document.getElementById('username-input').value.trim();
+            
+            if (!username) {
+                alert('Silakan masukkan username!');
+                return;
+            }
+
+            try {
+                console.log('Attempting login...');
+                // Login anonymous ke Firebase
+                const userCredential = await auth.signInAnonymously();
+                console.log('Login success:', userCredential);
+                
+                currentUser = {
+                    uid: userCredential.user.uid,
+                    username: username
+                };
+                
+                showChatSection();
+                setupChatListener();
+                
+                // Tambahkan pesan welcome
+                await addWelcomeMessage(username);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Error saat login: ' + error.message);
+            }
+        }
+
+        // Tambahkan pesan welcome
+        async function addWelcomeMessage(username) {
+            try {
+                await db.collection('messages').add({
+                    text: `Selamat datang ${username}! 🎉 Mulai chat sekarang!`,
+                    username: 'System',
+                    userId: 'system',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error('Error adding welcome message:', error);
+            }
+        }
+
+        // Fungsi Logout
+        async function logout() {
+            try {
+                await auth.signOut();
+                currentUser = null;
+                showLoginSection();
+                document.getElementById('messages-container').innerHTML = '';
+                document.getElementById('username-input').value = '';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        // Tampilkan section login
+        function showLoginSection() {
+            document.getElementById('login-section').classList.remove('hidden');
+            document.getElementById('chat-section').classList.add('hidden');
+        }
+
+        // Tampilkan section chat
+        function showChatSection() {
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('chat-section').classList.remove('hidden');
+            document.getElementById('current-user').textContent = `👤 ${currentUser.username}`;
+            document.getElementById('message-input').focus();
+        }
+
+        // Kirim pesan
+        async function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (!message || !currentUser) return;
+
+            try {
+                await db.collection('messages').add({
+                    text: message,
+                    username: currentUser.username,
+                    userId: currentUser.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                messageInput.value = ''; // Clear input
+            } catch (error) {
+                console.error('Error sending message:', error);
+                alert('Error mengirim pesan: ' + error.message);
+            }
+        }
+
+        // Setup real-time listener untuk pesan
+        function setupChatListener() {
+            console.log('Setting up chat listener...');
+            
+            db.collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((snapshot) => {
+                    console.log('New message received');
+                    const messagesContainer = document.getElementById('messages-container');
+                    messagesContainer.innerHTML = '';
+                    
+                    snapshot.forEach((doc) => {
+                        const message = doc.data();
+                        displayMessage(message);
+                    });
+                    
+                    // Scroll ke bawah
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }, (error) => {
+                    console.error('Chat listener error:', error);
+                });
+        }
+
+        // Tampilkan pesan di UI
+        function displayMessage(message) {
+            const messagesContainer = document.getElementById('messages-container');
+            const messageElement = document.createElement('div');
+            
+            const isOwnMessage = currentUser && message.userId === currentUser.uid;
+            const isSystemMessage = message.userId === 'system';
+            
+            // Format waktu
+            let time = 'Sekarang';
+            if (message.timestamp) {
+                try {
+                    time = message.timestamp.toDate().toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } catch (error) {
+                    console.log('Timestamp error:', error);
+                }
+            }
+            
+            if (isSystemMessage) {
+                messageElement.className = 'message system';
+                messageElement.style.cssText = `
+                    background: #f39c12;
+                    color: white;
+                    text-align: center;
+                    max-width: 90%;
+                    margin: 10px auto;
+                    font-style: italic;
+                    padding: 10px;
+                    border-radius: 10px;
+                `;
+            } else {
+                messageElement.className = `message ${isOwnMessage ? 'own' : 'other'}`;
+            }
+            
+            messageElement.innerHTML = `
+                ${!isSystemMessage ? `<div class="message-sender">${message.username}</div>` : ''}
+                <div>${message.text}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+        }
+    </script>
+</body>
+</html>
